@@ -1,11 +1,12 @@
 
+import Sidebar from "../../components/Sidebar/Sidebar";
 import "./Home.css";
 
-const Home = () => {
+const Home = ({sidebar}) => {
   return (
-    <div>
-      
-    </div>
+    <>
+    <Sidebar sidebar={sidebar}/>
+    </>
   )
 }
 
