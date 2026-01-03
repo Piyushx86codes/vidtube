@@ -1,6 +1,8 @@
-import React from 'react';
-import {Link} from "react-router-dom"
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import "./feed.css";
+import { API_KEY, value_converter } from "../../data";
+
 import thumbnail1 from "../../assets/thumbnail1.png";
 import thumbnail2 from "../../assets/thumbnail2.png";
 import thumbnail3 from "../../assets/thumbnail3.png";
@@ -10,107 +12,35 @@ import thumbnail6 from "../../assets/thumbnail6.png";
 import thumbnail7 from "../../assets/thumbnail7.png";
 import thumbnail8 from "../../assets/thumbnail8.png";
 
-const Feed = () => {
-  return (
-   <div className="feed">
-     <Link to={`video/20/4521`} className='card'>
-      <img src={thumbnail1} alt=''/>
-      <h2>Best channel to learni coding that help you to be a web developer</h2>
-      <h3>GreatStack</h3>
-      <p>15k views , 2 days ago</p>
-    </Link>
-    <div className='card'>
-      <img src={thumbnail2} alt=''/>
-      <h2>Best channel to learni coding that help you to be a web developer</h2>
-      <h3>GreatStack</h3>
-      <p>15k views , 2 days ago</p>
-    </div>
-    <div className='card'>
-      <img src={thumbnail3} alt=''/>
-      <h2>Best channel to learni coding that help you to be a web developer</h2>
-      <h3>GreatStack</h3>
-      <p>15k views , 2 days ago</p>
-    </div>
-    <div className='card'>
-      <img src={thumbnail4} alt=''/>
-      <h2>Best channel to learni coding that help you to be a web developer</h2>
-      <h3>GreatStack</h3>
-      <p>15k views , 2 days ago</p>
-    </div>
-    <div className='card'>
-      <img src={thumbnail5} alt=''/>
-      <h2>Best channel to learni coding that help you to be a web developer</h2>
-      <h3>GreatStack</h3>
-      <p>15k views , 2 days ago</p>
-    </div>
-    <div className='card'>
-      <img src={thumbnail6} alt=''/>
-      <h2>Best channel to learni coding that help you to be a web developer</h2>
-      <h3>GreatStack</h3>
-      <p>15k views , 2 days ago</p>
-    </div>
-    <div className='card'>
-      <img src={thumbnail7} alt=''/>
-      <h2>Best channel to learni coding that help you to be a web developer</h2>
-      <h3>GreatStack</h3>
-      <p>15k views , 2 days ago</p>
-    </div>
-    <div className='card'>
-      <img src={thumbnail8} alt=''/>
-      <h2>Best channel to learni coding that help you to be a web developer</h2>
-      <h3>GreatStack</h3>
-      <p>15k views , 2 days ago</p>
-    </div>
-    <div className='card'>
-      <img src={thumbnail1} alt=''/>
-      <h2>Best channel to learni coding that help you to be a web developer</h2>
-      <h3>GreatStack</h3>
-      <p>15k views , 2 days ago</p>
-    </div>
-    <div className='card'>
-      <img src={thumbnail2} alt=''/>
-      <h2>Best channel to learni coding that help you to be a web developer</h2>
-      <h3>GreatStack</h3>
-      <p>15k views , 2 days ago</p>
-    </div>
-    <div className='card'>
-      <img src={thumbnail3} alt=''/>
-      <h2>Best channel to learni coding that help you to be a web developer</h2>
-      <h3>GreatStack</h3>
-      <p>15k views , 2 days ago</p>
-    </div>
-    <div className='card'>
-      <img src={thumbnail4} alt=''/>
-      <h2>Best channel to learni coding that help you to be a web developer</h2>
-      <h3>GreatStack</h3>
-      <p>15k views , 2 days ago</p>
-    </div>
-    <div className='card'>
-      <img src={thumbnail5} alt=''/>
-      <h2>Best channel to learni coding that help you to be a web developer</h2>
-      <h3>GreatStack</h3>
-      <p>15k views , 2 days ago</p>
-    </div>
-    <div className='card'>
-      <img src={thumbnail6} alt=''/>
-      <h2>Best channel to learni coding that help you to be a web developer</h2>
-      <h3>GreatStack</h3>
-      <p>15k views , 2 days ago</p>
-    </div>
-    <div className='card'>
-      <img src={thumbnail7} alt=''/>
-      <h2>Best channel to learni coding that help you to be a web developer</h2>
-      <h3>GreatStack</h3>
-      <p>15k views , 2 days ago</p>
-    </div>
-    <div className='card'>
-      <img src={thumbnail8} alt=''/>
-      <h2>Best channel to learni coding that help you to be a web developer</h2>
-      <h3>GreatStack</h3>
-      <p>15k views , 2 days ago</p>
-    </div>
-   </div>
-  )
-}
+const Feed = ({category}) => {
+  const fetchdata = async () => {
+    const [Data, setData] = useState([]);
+    const videoListUrl = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&chart=mostPopular&maxResults=40&regionCode=US&videoCategoryId=${category}&key=${API_KEY}`;
+    await fetch(videoListUrl)
+      .then((response) => response.json())
+      .then((result) => setData(result.item));
+  };
 
-export default Feed
+  useEffect(() => {
+    fetchdata();
+  }, [category]);
+
+  return (
+    <div className="feed">
+      {Data.map((item, index) => {
+        return (
+          <Link to={`video/${item.snippet.categoryId}/${item.id}`} className="card">
+            <img src={item.snippet.thumbnails.medium.url} alt="" />
+            <h2>
+             {item.snippet.title}
+            </h2>
+            <h3>{item.snippet.channelTitle}</h3>
+            <p>${value_converter(item.statistics.viewCount)} views &bull; {moment(item.snippet.publishedAt)}.fromNow</p>
+          </Link>
+        );
+      })}
+    </div>
+  );
+};
+
+export default Feed;
